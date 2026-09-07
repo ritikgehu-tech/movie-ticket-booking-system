@@ -1,0 +1,19 @@
+// Inheritance + Runtime Polymorphism
+
+class CashPayment : public Payment {
+
+public:
+    bool pay(double amount) override {
+
+        cout << "\nCash payment of Rs."
+             << fixed << setprecision(2)
+             << amount
+             << " received.\n";
+
+        return true;
+    }
+
+    string methodName() const override {
+        return "CASH";
+    }
+};
