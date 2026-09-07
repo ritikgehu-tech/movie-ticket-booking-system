@@ -1,0 +1,50 @@
+class TicketPrinter {
+
+public:
+
+    void printTicket(const Booking& booking) const {
+
+        cout << "\n";
+        cout << "============================================\n";
+        cout << "                  TICKET\n";
+        cout << "============================================\n";
+
+        cout << "Booking ID : "
+             << booking.getBookingId()
+             << "\n";
+
+        cout << "Movie      : "
+             << booking.getShow()
+                    ->getMovie()
+                    ->getTitle()
+             << "\n";
+
+        cout << "Screen     : "
+             << booking.getShow()
+                    ->getScreen()
+                    ->getScreenNumber()
+             << "\n";
+
+        cout << "Time       : "
+             << booking.getShow()
+                    ->getStartTime()
+             << "\n";
+
+        cout << "Seats      : ";
+
+        for (const auto* seat : booking.getSeats()) {
+            cout << seat->getSeatNumber() << " ";
+        }
+
+        cout << "\n";
+
+        cout << "Total      : Rs."
+             << fixed << setprecision(2)
+             << booking.getTotalAmount()
+             << "\n";
+
+        cout << "Status     : CONFIRMED\n";
+
+        cout << "============================================\n";
+    }
+};
