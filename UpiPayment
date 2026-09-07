@@ -1,0 +1,30 @@
+// Inheritance + Runtime Polymorphism
+
+class UpiPayment : public Payment {
+private:
+    string upiId;
+
+public:
+    UpiPayment(string upiId)
+        : upiId(upiId) {}
+
+    bool pay(double amount) override {
+
+        if (upiId.empty()) {
+            cout << "Invalid UPI ID.\n";
+            return false;
+        }
+
+        cout << "\nProcessing UPI payment of Rs."
+             << fixed << setprecision(2)
+             << amount << "...\n";
+
+        cout << "UPI payment successful.\n";
+
+        return true;
+    }
+
+    string methodName() const override {
+        return "UPI";
+    }
+};
