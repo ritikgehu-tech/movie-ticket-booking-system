@@ -1,0 +1,522 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iomanip>
+#include <limits>
+
+using namespace std;
+
+
+// ===============================
+// INCLUDE ALL CLASS FILES
+// ===============================
+
+#include "Movie.cpp"
+#include "Seat.cpp"
+#include "Screen.cpp"
+#include "Cinema.cpp"
+#include "ShowSeat.cpp"
+#include "Show.cpp"
+#include "Customer.cpp"
+#include "Payment.cpp"
+#include "UpiPayment.cpp"
+#include "CardPayment.cpp"
+#include "CashPayment.cpp"
+#include "PriceCalculator.cpp"
+#include "Booking.cpp"
+#include "TicketPrinter.cpp"
+#include "BookingService.cpp"
+
+
+// ===============================
+// INPUT FUNCTIONS
+// ===============================
+
+void clearInput() {
+
+    cin.clear();
+
+    cin.ignore(
+        numeric_limits<streamsize>::max(),
+        '\n'
+    );
+}
+
+
+int readInt(string message) {
+
+    int value;
+
+    while (true) {
+
+        cout << message;
+
+        if (cin >> value) {
+            return value;
+        }
+
+        cout << "Invalid input. Please enter a number.\n";
+
+        clearInput();
+    }
+}
+
+
+string readString(string message) {
+
+    cout << message;
+
+    string value;
+
+    cin >> value;
+
+    return value;
+}
+
+
+// ===============================
+// MAIN FUNCTION
+// ===============================
+
+int main() {
+
+    // ==========================================
+    // CREATE CINEMA
+    // ==========================================
+
+    Cinema cinema("PVR Cinema");
+
+    // Composition
+    cinema.addScreen(Screen(1));
+    cinema.addScreen(Screen(2));
+
+
+    // ==========================================
+    // CREATE MOVIES
+    // ==========================================
+
+    Movie movie1(
+        "Avengers: Endgame",
+        "English",
+        181
+    );
+
+    Movie movie2(
+        "3 Idiots",
+        "Hindi",
+        170
+    );
+
+
+    vector<Movie*> movies;
+
+    movies.push_back(&movie1);
+    movies.push_back(&movie2);
+
+
+    // ==========================================
+    // CREATE SHOWS
+    // ==========================================
+
+    Show show1(
+        1,
+        &movie1,
+        cinema.findScreen(1),
+        "10:00 AM"
+    );
+
+    Show show2(
+        2,
+        &movie1,
+        cinema.findScreen(1),
+        "02:00 PM"
+    );
+
+    Show show3(
+        3,
+        &movie2,
+        cinema.findScreen(2),
+        "06:00 PM"
+    );
+
+
+    vector<Show*> shows;
+
+    shows.push_back(&show1);
+    shows.push_back(&show2);
+    shows.push_back(&show3);
+
+
+    // ==========================================
+    // CUSTOMER
+    // ==========================================
+
+    Customer customer(
+        "Ritik",
+        "9876543210"
+    );
+
+
+    // ==========================================
+    // SERVICES
+    // ==========================================
+
+    PriceCalculator priceCalculator;
+
+    TicketPrinter ticketPrinter;
+
+    BookingService bookingService(
+        priceCalculator,
+        ticketPrinter
+    );
+
+
+    vector<Booking*> bookings;
+
+
+    // ==========================================
+    // MENU
+    // ==========================================
+
+    while (true) {
+
+        cout << "\n\n";
+        cout << "====================================\n";
+        cout << "       MOVIE TICKET BOOKING\n";
+        cout << "====================================\n";
+
+        cout << "1. List all movies\n";
+        cout << "2. List shows for a movie\n";
+        cout << "3. Display seat layout\n";
+        cout << "4. Book ticket\n";
+        cout << "5. Cancel booking\n";
+        cout << "6. Exit\n";
+
+        int choice =
+            readInt("Enter choice: ");
+
+
+        // ======================================
+        // F1 - LIST MOVIES
+        // ======================================
+
+        if (choice == 1) {
+
+            cout << "\n";
+            cout << "Movies Currently Playing:\n";
+
+            for (int i = 0;
+                 i < movies.size();
+                 i++) {
+
+                cout << i + 1
+                     << ". "
+                     << movies[i]->getTitle()
+                     << " | "
+                     << movies[i]->getLanguage()
+                     << " | "
+                     << movies[i]->getDuration()
+                     << " min\n";
+            }
+        }
+
+
+        // ======================================
+        // F2 - LIST SHOWS
+        // ======================================
+
+        else if (choice == 2) {
+
+            int movieChoice =
+                readInt("Enter movie number: ");
+
+
+            if (movieChoice < 1 ||
+                movieChoice > movies.size()) {
+
+                cout << "Invalid movie choice.\n";
+
+                continue;
+            }
+
+
+            Movie* selectedMovie =
+                movies[movieChoice - 1];
+
+
+            cout << "\nShows for "
+                 << selectedMovie->getTitle()
+                 << ":\n";
+
+
+            for (const auto* show : shows) {
+
+                if (show->getMovie()
+                    == selectedMovie) {
+
+                    cout << "Show ID: "
+                         << show->getShowId()
+
+                         << " | Screen: "
+                         << show->getScreen()
+                                ->getScreenNumber()
+
+                         << " | Start: "
+                         << show->getStartTime()
+
+                         << "\n";
+                }
+            }
+        }
+
+
+        // ======================================
+        // F3 - DISPLAY SEATS
+        // ======================================
+
+        else if (choice == 3) {
+
+            int showId =
+                readInt("Enter show ID: ");
+
+
+            Show* selectedShow = nullptr;
+
+
+            for (auto* show : shows) {
+
+                if (show->getShowId()
+                    == showId) {
+
+                    selectedShow = show;
+                }
+            }
+
+
+            if (selectedShow == nullptr) {
+
+                cout << "Invalid show ID.\n";
+
+                continue;
+            }
+
+
+            selectedShow->displaySeats();
+        }
+
+
+        // ======================================
+        // F4/F5/F6/F7 - BOOK TICKET
+        // ======================================
+
+        else if (choice == 4) {
+
+            int showId =
+                readInt("Enter show ID: ");
+
+
+            Show* selectedShow = nullptr;
+
+
+            for (auto* show : shows) {
+
+                if (show->getShowId()
+                    == showId) {
+
+                    selectedShow = show;
+                }
+            }
+
+
+            if (selectedShow == nullptr) {
+
+                cout << "Invalid show ID.\n";
+
+                continue;
+            }
+
+
+            // Display available seats
+            selectedShow->displaySeats();
+
+
+            int count =
+                readInt(
+                    "How many seats do you want to book? "
+                );
+
+
+            if (count <= 0) {
+
+                cout << "Seat count must be positive.\n";
+
+                continue;
+            }
+
+
+            vector<int> seatNumbers;
+
+
+            for (int i = 0;
+                 i < count;
+                 i++) {
+
+                int seatNo =
+                    readInt("Enter seat number: ");
+
+                seatNumbers.push_back(seatNo);
+            }
+
+
+            // ==================================
+            // PAYMENT
+            // ==================================
+
+            cout << "\n";
+            cout << "Payment Method\n";
+
+            cout << "1. UPI\n";
+            cout << "2. Card\n";
+            cout << "3. Cash\n";
+
+
+            int paymentChoice =
+                readInt("Choose payment method: ");
+
+
+            Payment* payment = nullptr;
+
+
+            // Runtime Polymorphism
+            if (paymentChoice == 1) {
+
+                string upi =
+                    readString("Enter UPI ID: ");
+
+                payment =
+                    new UpiPayment(upi);
+            }
+
+
+            else if (paymentChoice == 2) {
+
+                string card =
+                    readString(
+                        "Enter last 4 digits of card: "
+                    );
+
+                payment =
+                    new CardPayment(card);
+            }
+
+
+            else if (paymentChoice == 3) {
+
+                payment =
+                    new CashPayment();
+            }
+
+
+            else {
+
+                cout << "Invalid payment choice.\n";
+
+                continue;
+            }
+
+
+            // ==================================
+            // BOOK TICKET
+            // ==================================
+
+            Booking* booking =
+                bookingService.bookTicket(
+                    customer,
+                    *selectedShow,
+                    seatNumbers,
+                    *payment
+                );
+
+
+            if (booking != nullptr) {
+
+                bookings.push_back(booking);
+            }
+
+
+            delete payment;
+        }
+
+
+        // ======================================
+        // F8 - CANCEL BOOKING
+        // ======================================
+
+        else if (choice == 5) {
+
+            int bookingId =
+                readInt(
+                    "Enter booking ID to cancel: "
+                );
+
+
+            Booking* selectedBooking = nullptr;
+
+
+            for (auto* booking : bookings) {
+
+                if (booking->getBookingId()
+                    == bookingId) {
+
+                    selectedBooking = booking;
+                }
+            }
+
+
+            if (selectedBooking == nullptr) {
+
+                cout << "Booking not found.\n";
+
+                continue;
+            }
+
+
+            bookingService.cancelBooking(
+                *selectedBooking
+            );
+        }
+
+
+        // ======================================
+        // EXIT
+        // ======================================
+
+        else if (choice == 6) {
+
+            cout << "\n";
+            cout << "Thank you for using "
+                 << "Movie Ticket Booking System!\n";
+
+
+            for (auto* booking : bookings) {
+                delete booking;
+            }
+
+
+            break;
+        }
+
+
+        // ======================================
+        // INVALID CHOICE
+        // ======================================
+
+        else {
+
+            cout << "Invalid menu choice.\n";
+        }
+    }
+
+
+    return 0;
+}
