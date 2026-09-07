@@ -1,0 +1,27 @@
+class PriceCalculator {
+private:
+    static constexpr double SILVER_PRICE = 150.0;
+    static constexpr double GOLD_PRICE = 250.0;
+    static constexpr double PLATINUM_PRICE = 400.0;
+
+public:
+    double calculate(const vector<ShowSeat*>& seats) const {
+
+        double total = 0;
+
+        for (const auto* seat : seats) {
+
+            if (seat->getSeatType() == Seat::Type::SILVER) {
+                total += SILVER_PRICE;
+            }
+            else if (seat->getSeatType() == Seat::Type::GOLD) {
+                total += GOLD_PRICE;
+            }
+            else {
+                total += PLATINUM_PRICE;
+            }
+        }
+
+        return total;
+    }
+};
