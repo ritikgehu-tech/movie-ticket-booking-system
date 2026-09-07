@@ -1,0 +1,43 @@
+class Screen {
+private:
+    int screenNumber;
+    vector<Seat> seats;
+
+public:
+    Screen(int screenNumber)
+        : screenNumber(screenNumber) {
+
+        // 1-4 Silver
+        for (int i = 1; i <= 4; i++) {
+            seats.emplace_back(i, Seat::Type::SILVER);
+        }
+
+        // 5-8 Gold
+        for (int i = 5; i <= 8; i++) {
+            seats.emplace_back(i, Seat::Type::GOLD);
+        }
+
+        // 9-10 Platinum
+        for (int i = 9; i <= 10; i++) {
+            seats.emplace_back(i, Seat::Type::PLATINUM);
+        }
+    }
+
+    int getScreenNumber() const {
+        return screenNumber;
+    }
+
+    const vector<Seat>& getSeats() const {
+        return seats;
+    }
+
+    const Seat* findSeat(int number) const {
+        for (const auto& seat : seats) {
+            if (seat.getNumber() == number) {
+                return &seat;
+            }
+        }
+
+        return nullptr;
+    }
+};
