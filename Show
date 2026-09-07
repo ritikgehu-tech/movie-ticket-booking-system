@@ -1,0 +1,104 @@
+class Show {
+private:
+    int showId;
+    const Movie* movie;
+    const Screen* screen;
+    string startTime;
+
+    vector<ShowSeat> showSeats;
+
+public:
+    Show(int showId,
+         const Movie* movie,
+         const Screen* screen,
+         string startTime)
+        : showId(showId),
+          movie(movie),
+          screen(screen),
+          startTime(startTime) {
+
+        for (const auto& seat : screen->getSeats()) {
+            showSeats.emplace_back(&seat);
+        }
+    }
+
+    int getShowId() const {
+        return showId;
+    }
+
+    const Movie* getMovie() const {
+        return movie;
+    }
+
+    const Screen* getScreen() const {
+        return screen;
+    }
+
+    string getStartTime() const {
+        return startTime;
+    }
+
+    vector<ShowSeat>& getShowSeats() {
+        return showSeats;
+    }
+
+    ShowSeat* findShowSeat(int seatNumber) {
+        for (auto& showSeat : showSeats) {
+            if (showSeat.getSeatNumber() == seatNumber) {
+                return &showSeat;
+            }
+        }
+
+        return nullptr;
+    }
+
+    void displaySeats() const {
+        cout << "\nScreen "
+             << screen->getScreenNumber()
+             << " | "
+             << movie->getTitle()
+             << " | "
+             << startTime << "\n";
+
+        cout << "\nSILVER : ";
+
+        for (const auto& seat : showSeats) {
+            if (seat.getSeatType() == Seat::Type::SILVER) {
+                cout << seat.getSeatNumber()
+                     << "-"
+                     << (seat.isAvailable()
+                         ? "AVAILABLE"
+                         : "BOOKED")
+                     << "  ";
+            }
+        }
+
+        cout << "\nGOLD : ";
+
+        for (const auto& seat : showSeats) {
+            if (seat.getSeatType() == Seat::Type::GOLD) {
+                cout << seat.getSeatNumber()
+                     << "-"
+                     << (seat.isAvailable()
+                         ? "AVAILABLE"
+                         : "BOOKED")
+                     << "  ";
+            }
+        }
+
+        cout << "\nPLATINUM : ";
+
+        for (const auto& seat : showSeats) {
+            if (seat.getSeatType() == Seat::Type::PLATINUM) {
+                cout << seat.getSeatNumber()
+                     << "-"
+                     << (seat.isAvailable()
+                         ? "AVAILABLE"
+                         : "BOOKED")
+                     << "  ";
+            }
+        }
+
+        cout << "\n";
+    }
+};
