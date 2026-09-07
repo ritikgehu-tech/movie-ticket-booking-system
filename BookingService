@@ -1,0 +1,124 @@
+class BookingService {
+private:
+    PriceCalculator& priceCalculator;
+    TicketPrinter& ticketPrinter;
+
+public:
+
+    BookingService(PriceCalculator& priceCalculator,
+                   TicketPrinter& ticketPrinter)
+        : priceCalculator(priceCalculator),
+          ticketPrinter(ticketPrinter) {}
+
+    Booking* bookTicket(
+        Customer& customer,
+        Show& show,
+        const vector<int>& seatNumbers,
+        Payment& payment) {
+
+        vector<ShowSeat*> selectedSeats;
+
+        // Validate all seats before booking anything
+        for (int number : seatNumbers) {
+
+            ShowSeat* seat =
+                show.findShowSeat(number);
+
+            if (seat == nullptr) {
+                cout << "Invalid seat number: "
+                     << number << "\n";
+
+                return nullptr;
+            }
+
+            if (!seat->isAvailable()) {
+                cout << "Seat "
+                     << number
+                     << " is already BOOKED.\n";
+
+                return nullptr;
+            }
+
+            // Duplicate seat validation
+            for (const auto* selected : selectedSeats) {
+
+                if (selected->getSeatNumber() == number) {
+
+                    cout << "Seat "
+                         << number
+                         << " entered more than once.\n";
+
+                    return nullptr;
+                }
+            }
+
+            selectedSeats.push_back(seat);
+        }
+
+        if (selectedSeats.empty()) {
+
+            cout << "No seats selected.\n";
+
+            return nullptr;
+        }
+
+        double total =
+            priceCalculator.calculate(selectedSeats);
+
+        cout << "\nTotal amount: Rs."
+             << fixed << setprecision(2)
+             << total << "\n";
+
+        // Payment happens before confirmation
+        bool paid = payment.pay(total);
+
+        if (!paid) {
+
+            cout << "Payment FAILED.\n";
+            cout << "Booking NOT confirmed.\n";
+
+            return nullptr;
+        }
+
+        // Book seats only after successful payment
+        for (auto* seat : selectedSeats) {
+            seat->bookSeat();
+        }
+
+        // Create Booking object
+        Booking* booking =
+            new Booking(
+                &customer,
+                &show,
+                selectedSeats,
+                total
+            );
+
+        ticketPrinter.printTicket(*booking);
+
+        return booking;
+    }
+
+    void cancelBooking(Booking& booking) {
+
+        if (booking.getStatus()
+            == Booking::Status::CANCELLED) {
+
+            cout << "Booking is already cancelled.\n";
+
+            return;
+        }
+
+        for (auto* seat : booking.getSeats()) {
+            seat->cancelSeat();
+        }
+
+        booking.cancel();
+
+        cout << "Booking "
+             << booking.getBookingId()
+             << " cancelled successfully.\n";
+
+        cout << "Seats are AVAILABLE again.\n";
+    }
+};
