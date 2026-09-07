@@ -1,0 +1,63 @@
+class Booking {
+public:
+    enum class Status {
+        CONFIRMED,
+        CANCELLED
+    };
+
+private:
+    // Static member for unique booking IDs
+    static int nextBookingId;
+
+    int bookingId;
+
+    const Customer* customer;
+    Show* show;
+
+    vector<ShowSeat*> seats;
+
+    double totalAmount;
+
+    Status status;
+
+public:
+
+    Booking(const Customer* customer,
+            Show* show,
+            const vector<ShowSeat*>& seats,
+            double totalAmount)
+        : customer(customer),
+          show(show),
+          seats(seats),
+          totalAmount(totalAmount),
+          status(Status::CONFIRMED) {
+
+        bookingId = nextBookingId++;
+    }
+
+    int getBookingId() const {
+        return bookingId;
+    }
+
+    double getTotalAmount() const {
+        return totalAmount;
+    }
+
+    Status getStatus() const {
+        return status;
+    }
+
+    Show* getShow() const {
+        return show;
+    }
+
+    const vector<ShowSeat*>& getSeats() const {
+        return seats;
+    }
+
+    void cancel() {
+        status = Status::CANCELLED;
+    }
+};
+
+int Booking::nextBookingId = 1001;
