@@ -1,0 +1,44 @@
+class ShowSeat {
+public:
+    enum class Status {
+        AVAILABLE,
+        BOOKED
+    };
+
+private:
+    const Seat* seat;
+    Status status;
+
+public:
+    ShowSeat(const Seat* seat)
+        : seat(seat), status(Status::AVAILABLE) {}
+
+    int getSeatNumber() const {
+        return seat->getNumber();
+    }
+
+    Seat::Type getSeatType() const {
+        return seat->getType();
+    }
+
+    string getSeatTypeName() const {
+        return seat->getTypeName();
+    }
+
+    bool isAvailable() const {
+        return status == Status::AVAILABLE;
+    }
+
+    bool bookSeat() {
+        if (!isAvailable()) {
+            return false;
+        }
+
+        status = Status::BOOKED;
+        return true;
+    }
+
+    void cancelSeat() {
+        status = Status::AVAILABLE;
+    }
+};
